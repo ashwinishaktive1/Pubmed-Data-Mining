@@ -1,0 +1,41 @@
+---
+title: "practicum 2"
+author: "Pooja Ramakrishnan, Ashwini Shaktivel Kumar"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("RMySQL")
+library(RMySQL)
+
+```
+
+```{r}
+con = dbConnect(RMySQL::MySQL(),
+                            dbname='pract',
+                            host='localhost',
+                            port=3306,
+                            user='root',
+                            password='Ramanathapuram@14')
+```
+
+1.  **Top ten authors with the most publications.**
+
+```{r}
+dbGetQuery(con, "select ForeName, LastName, AuthorID, ArticlesCount as NoOfPublications from authorfacts order by NoOfPublications desc limit 10")
+```
+
+To find the details of authors who have had the maximum publications, the author Facts table is used which is much more effective than parsing through multiple tables. The data shown is the result of top 10 authors that had the most number of publications of all time. Since the xml subset we have used contains only the first 300 elements, the results are accordingly. It can be seen that **Angeielski** had the maximum publications of **3** followed by many others who has had 2 publications.
+
+2.  **Number of articles per journal per year broken down by quarter**
+
+```{r}
+dbGetQuery (con, "select Title as JournalTitle, QUARTER(tDate) as quarter, year(tDate) as year, count(ArticleID) as NoOfArticles from JournalFact group by Title,year,quarter order by year, NoofArticles desc")
+```
+
+To have a better insights on the statistics, the journal publications data is broken down among different years and quarters. Again, the following analysis was performed on the Journals Fact table which contains details about the Journals and their publication dates. This makes it easy to find out which part of the year witnesses the maximum publications. It can be seen that there has been number of articles for the journal '**Biochimica et biophysica acta**' in the year **1975** on the 4th quarter with 92 articles. In the year 1975, 92 articles were published on the 4th quarter whereas **1976** saw the maximum in 1st quarter with 44 publications.
